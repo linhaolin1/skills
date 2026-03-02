@@ -1,5 +1,5 @@
 ---
-name: AKShare 财经数据 HTTP API
+name: AKShare-HTTP-API
 description: 提供股票、期货、期权、基金、债券、外汇、加密货币等金融产品的 HTTP API 数据接口，支持通过 curl 直接调用
 version: 2.0.0
 author: AKShare Community
