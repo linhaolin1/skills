@@ -688,6 +688,537 @@ done
 
 ---
 
+## 新浪财经接口
+
+### 1. A股实时行情数据（新浪）
+
+**接口名称**: A股实时行情
+
+**数据源**: 新浪财经
+
+**目标地址**: http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData
+
+**描述**: 获取所有 A 股的实时行情数据
+
+**请求方式**: GET
+
+**输入参数**:
+| 参数名 | 类型 | 必填 | 说明 | 示例值 |
+|--------|------|------|------|--------|
+| page | string | 是 | 页码 | 1 |
+| num | string | 是 | 每页数量 | 80 |
+| sort | string | 是 | 排序字段 | symbol |
+| asc | string | 是 | 升序排列 | 1 |
+| node | string | 是 | 节点 | hs_a |
+| symbol | string | 是 | 股票代码 | 空 |
+| _s_r_a | string | 是 | 参数 | page |
+
+**返回字段说明**:
+| 字段 | 说明 |
+|------|------|
+| 代码 | 股票代码 |
+| 名称 | 股票名称 |
+| 最新价 | 当前价格 |
+| 涨跌额 | 涨跌金额 |
+| 涨跌幅 | 涨跌百分比 |
+| 买入 | 买一价 |
+| 卖出 | 卖一价 |
+| 昨收 | 昨日收盘价 |
+| 今开 | 今日开盘价 |
+| 最高 | 最高价 |
+| 最低 | 最低价 |
+| 成交量 | 成交量 |
+| 成交额 | 成交额 |
+| 时间戳 | 时间戳 |
+
+**curl 调用示例**:
+
+```bash
+# 获取A股实时行情第一页
+curl -X GET "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=80&sort=symbol&asc=1&node=hs_a&symbol=&_s_r_a=page"
+```
+
+---
+
+### 2. A股历史行情数据（新浪）
+
+**接口名称**: A股历史K线数据
+
+**数据源**: 新浪财经
+
+**目标地址**: https://finance.sina.com.cn/realstock/company/{symbol}/hisdata_klc2/klc_kl.js
+
+**描述**: 获取 A 股个股的历史行情数据，支持前复权、后复权
+
+**请求方式**: GET
+
+**输入参数**:
+| 参数名 | 类型 | 必填 | 说明 | 示例值 |
+|--------|------|------|------|--------|
+| symbol | string | 是 | 股票代码（带市场前缀） | sh600519, sz000001 |
+
+**symbol 说明**:
+- 上海市场：sh + 股票代码，如 sh600519
+- 深圳市场：sz + 股票代码，如 sz000001
+
+**返回字段说明**:
+| 字段 | 说明 |
+|------|------|
+| date | 日期 |
+| open | 开盘价 |
+| high | 最高价 |
+| low | 最低价 |
+| close | 收盘价 |
+| volume | 成交量 |
+| amount | 成交额 |
+
+**curl 调用示例**:
+
+```bash
+# 获取贵州茅台(sh600519)历史行情数据
+curl -X GET "https://finance.sina.com.cn/realstock/company/sh600519/hisdata_klc2/klc_kl.js"
+
+# 获取平安银行(sz000001)历史行情数据
+curl -X GET "https://finance.sina.com.cn/realstock/company/sz000001/hisdata_klc2/klc_kl.js"
+```
+
+---
+
+### 3. A股复权因子（新浪）
+
+**接口名称**: 前复权/后复权因子
+
+**数据源**: 新浪财经
+
+**目标地址**: 
+- 前复权因子: https://finance.sina.com.cn/realstock/company/{symbol}/qfq.js
+- 后复权因子: https://finance.sina.com.cn/realstock/company/{symbol}/hfq.js
+
+**描述**: 获取股票的复权因子数据
+
+**请求方式**: GET
+
+**输入参数**:
+| 参数名 | 类型 | 必填 | 说明 | 示例值 |
+|--------|------|------|------|--------|
+| symbol | string | 是 | 股票代码（带市场前缀） | sh600519 |
+
+**curl 调用示例**:
+
+```bash
+# 获取贵州茅台前复权因子
+curl -X GET "https://finance.sina.com.cn/realstock/company/sh600519/qfq.js"
+
+# 获取贵州茅台后复权因子
+curl -X GET "https://finance.sina.com.cn/realstock/company/sh600519/hfq.js"
+```
+
+---
+
+### 4. A股分钟行情数据（新浪）
+
+**接口名称**: 分钟K线数据
+
+**数据源**: 新浪财经
+
+**目标地址**: https://quotes.sina.cn/cn/api/jsonp_v2.php/=/CN_MarketDataService.getKLineData
+
+**描述**: 获取股票及股票指数的分钟级行情数据
+
+**请求方式**: GET
+
+**输入参数**:
+| 参数名 | 类型 | 必填 | 说明 | 示例值 |
+|--------|------|------|------|--------|
+| symbol | string | 是 | 股票代码（带市场前缀） | sh600519 |
+| scale | string | 是 | 分钟周期 | 1, 5, 15, 30, 60 |
+| ma | string | 是 | 均线参数 | no |
+| datalen | string | 是 | 数据长度 | 1970 |
+
+**返回字段说明**:
+| 字段 | 说明 |
+|------|------|
+| day | 日期时间 |
+| open | 开盘价 |
+| high | 最高价 |
+| low | 最低价 |
+| close | 收盘价 |
+| volume | 成交量 |
+| amount | 成交额 |
+
+**curl 调用示例**:
+
+```bash
+# 获取贵州茅台1分钟K线数据
+curl -X GET "https://quotes.sina.cn/cn/api/jsonp_v2.php/=/CN_MarketDataService.getKLineData?symbol=sh600519&scale=1&ma=no&datalen=1970"
+
+# 获取贵州茅台5分钟K线数据
+curl -X GET "https://quotes.sina.cn/cn/api/jsonp_v2.php/=/CN_MarketDataService.getKLineData?symbol=sh600519&scale=5&ma=no&datalen=1970"
+```
+
+---
+
+### 5. 科创板实时行情数据（新浪）
+
+**接口名称**: 科创板实时行情
+
+**数据源**: 新浪财经
+
+**目标地址**: http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData
+
+**描述**: 获取科创板的实时行情数据
+
+**请求方式**: GET
+
+**输入参数**:
+| 参数名 | 类型 | 必填 | 说明 | 示例值 |
+|--------|------|------|------|--------|
+| page | string | 是 | 页码 | 1 |
+| num | string | 是 | 每页数量 | 80 |
+| sort | string | 是 | 排序字段 | symbol |
+| asc | string | 是 | 升序排列 | 1 |
+| node | string | 是 | 节点 | kcb |
+| symbol | string | 是 | 股票代码 | 空 |
+| _s_r_a | string | 是 | 参数 | auto |
+
+**返回字段说明**:
+| 字段 | 说明 |
+|------|------|
+| 代码 | 股票代码 |
+| 名称 | 股票名称 |
+| 最新价 | 当前价格 |
+| 涨跌额 | 涨跌金额 |
+| 涨跌幅 | 涨跌百分比 |
+| 买入 | 买一价 |
+| 卖出 | 卖一价 |
+| 昨收 | 昨日收盘价 |
+| 今开 | 今日开盘价 |
+| 最高 | 最高价 |
+| 最低 | 最低价 |
+| 成交量 | 成交量 |
+| 成交额 | 成交额 |
+| 市盈率 | 动态市盈率 |
+| 市净率 | 市净率 |
+| 流通市值 | 流通市值 |
+| 总市值 | 总市值 |
+| 换手率 | 换手率 |
+
+**curl 调用示例**:
+
+```bash
+# 获取科创板实时行情
+curl -X GET "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=80&sort=symbol&asc=1&node=kcb&symbol=&_s_r_a=auto"
+```
+
+---
+
+### 6. 科创板历史行情数据（新浪）
+
+**接口名称**: 科创板历史K线数据
+
+**数据源**: 新浪财经
+
+**目标地址**: https://quotes.sina.cn/cn/api/jsonp.php/var%20_{symbol}_{date}=/KC_MarketDataService.getKLineData?symbol={symbol}
+
+**描述**: 获取科创板股票的历史行情数据
+
+**请求方式**: GET
+
+**输入参数**:
+| 参数名 | 类型 | 必填 | 说明 | 示例值 |
+|--------|------|------|------|--------|
+| symbol | string | 是 | 股票代码（带市场前缀） | sh688399 |
+| date | string | 是 | 日期（格式：YYYY_MM_DD） | 2026_03_02 |
+
+**curl 调用示例**:
+
+```bash
+# 获取科创板股票历史行情
+curl -X GET "https://quotes.sina.cn/cn/api/jsonp.php/var%20_sh688399_2026_03_02=/KC_MarketDataService.getKLineData?symbol=sh688399"
+```
+
+---
+
+### 7. B股实时行情数据（新浪）
+
+**接口名称**: B股实时行情
+
+**数据源**: 新浪财经
+
+**目标地址**: http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData
+
+**描述**: 获取 B 股的实时行情数据
+
+**请求方式**: GET
+
+**输入参数**:
+| 参数名 | 类型 | 必填 | 说明 | 示例值 |
+|--------|------|------|------|--------|
+| page | string | 是 | 页码 | 1 |
+| num | string | 是 | 每页数量 | 80 |
+| sort | string | 是 | 排序字段 | symbol |
+| asc | string | 是 | 升序排列 | 1 |
+| node | string | 是 | 节点 | b股 |
+
+**curl 调用示例**:
+
+```bash
+# 获取B股实时行情
+curl -X GET "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=80&sort=symbol&asc=1&node=b股"
+```
+
+---
+
+### 8. 港股实时行情数据（新浪）
+
+**接口名称**: 港股实时行情
+
+**数据源**: 新浪财经
+
+**目标地址**: http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHKStockData
+
+**描述**: 获取港股的实时行情数据
+
+**请求方式**: GET
+
+**输入参数**:
+| 参数名 | 类型 | 必填 | 说明 | 示例值 |
+|--------|------|------|------|--------|
+| page | string | 是 | 页码 | 1 |
+| num | string | 是 | 每页数量 | 60 |
+| sort | string | 是 | 排序字段 | symbol |
+| asc | string | 是 | 升序排列 | 1 |
+| node | string | 是 | 节点 | qbgg_hk |
+| _s_r_a | string | 是 | 参数 | init |
+
+**返回字段说明**:
+| 字段 | 说明 |
+|------|------|
+| 代码 | 股票代码 |
+| 中文名称 | 股票中文名 |
+| 英文名称 | 股票英文名 |
+| 交易类型 | 交易类型 |
+| 最新价 | 当前价格 |
+| 昨收 | 昨日收盘价 |
+| 今开 | 今日开盘价 |
+| 最高 | 最高价 |
+| 最低 | 最低价 |
+| 成交量 | 成交量 |
+| 成交额 | 成交额 |
+| 日期时间 | 时间戳 |
+| 买一 | 买一价 |
+| 卖一 | 卖一价 |
+| 涨跌额 | 涨跌金额 |
+| 涨跌幅 | 涨跌百分比 |
+
+**curl 调用示例**:
+
+```bash
+# 获取港股实时行情
+curl -X GET "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHKStockData?page=1&num=60&sort=symbol&asc=1&node=qbgg_hk&_s_r_a=init"
+```
+
+---
+
+### 9. 港股历史行情数据（新浪）
+
+**接口名称**: 港股历史K线数据
+
+**数据源**: 新浪财经
+
+**目标地址**: https://finance.sina.com.cn/stock/hkstock/{symbol}/klc_kl.js
+
+**描述**: 获取港股个股的历史行情数据
+
+**请求方式**: GET
+
+**输入参数**:
+| 参数名 | 类型 | 必填 | 说明 | 示例值 |
+|--------|------|------|------|--------|
+| symbol | string | 是 | 股票代码 | 00700 |
+
+**curl 调用示例**:
+
+```bash
+# 获取腾讯控股(00700)历史行情数据
+curl -X GET "https://finance.sina.com.cn/stock/hkstock/00700/klc_kl.js"
+```
+
+---
+
+### 10. 港股复权因子（新浪）
+
+**接口名称**: 港股前复权/后复权因子
+
+**数据源**: 新浪财经
+
+**目标地址**: 
+- 前复权因子: https://finance.sina.com.cn/stock/hkstock/{symbol}/qfq.js
+- 后复权因子: https://finance.sina.com.cn/stock/hkstock/{symbol}/hfq.js
+
+**描述**: 获取港股的复权因子数据
+
+**请求方式**: GET
+
+**输入参数**:
+| 参数名 | 类型 | 必填 | 说明 | 示例值 |
+|--------|------|------|------|--------|
+| symbol | string | 是 | 股票代码 | 00700 |
+
+**curl 调用示例**:
+
+```bash
+# 获取腾讯控股前复权因子
+curl -X GET "https://finance.sina.com.cn/stock/hkstock/00700/qfq.js"
+
+# 获取腾讯控股后复权因子
+curl -X GET "https://finance.sina.com.cn/stock/hkstock/00700/hfq.js"
+```
+
+---
+
+### 11. 美股实时行情数据（新浪）
+
+**接口名称**: 美股实时行情
+
+**数据源**: 新浪财经
+
+**目标地址**: http://stock.finance.sina.com.cn/usstock/api/jsonp.php/IO.XSRV2.CallbackList[{}]/US_CategoryService.getList
+
+**描述**: 获取美股的实时行情数据
+
+**请求方式**: GET
+
+**输入参数**:
+| 参数名 | 类型 | 必填 | 说明 | 示例值 |
+|--------|------|------|------|--------|
+| page | string | 是 | 页码 | 1 |
+| num | string | 是 | 每页数量 | 20 |
+| sort | string | 是 | 排序字段 | 空 |
+| asc | string | 是 | 升序排列 | 0 |
+| market | string | 是 | 市场 | 空 |
+| id | string | 是 | 分类ID | 空 |
+
+**curl 调用示例**:
+
+```bash
+# 获取美股实时行情
+curl -X GET "http://stock.finance.sina.com.cn/usstock/api/jsonp.php/IO.XSRV2.CallbackList[123]/US_CategoryService.getList?page=1&num=20&sort=&asc=0&market=&id="
+```
+
+---
+
+### 12. 美股历史行情数据（新浪）
+
+**接口名称**: 美股历史K线数据
+
+**数据源**: 新浪财经
+
+**目标地址**: https://finance.sina.com.cn/us_stock/company/hisdata/klc_kl_{symbol}.js
+
+**描述**: 获取美股个股的历史行情数据
+
+**请求方式**: GET
+
+**输入参数**:
+| 参数名 | 类型 | 必填 | 说明 | 示例值 |
+|--------|------|------|------|--------|
+| symbol | string | 是 | 股票代码 | AAPL |
+
+**curl 调用示例**:
+
+```bash
+# 获取苹果(AAPL)历史行情数据
+curl -X GET "https://finance.sina.com.cn/us_stock/company/hisdata/klc_kl_AAPL.js"
+```
+
+---
+
+### 13. A+H股实时行情数据（腾讯）
+
+**接口名称**: A+H股实时行情
+
+**数据源**: 腾讯财经
+
+**目标地址**: http://stock.gtimg.cn/data/hk_rank.php
+
+**描述**: 获取 A+H 股的实时行情数据
+
+**请求方式**: GET
+
+**输入参数**:
+| 参数名 | 类型 | 必填 | 说明 | 示例值 |
+|--------|------|------|------|--------|
+| board | string | 是 | 板块 | A_H |
+| metric | string | 是 | 指标 | price |
+| pageSize | string | 是 | 每页数量 | 20 |
+| reqPage | string | 是 | 页码 | 1 |
+| order | string | 是 | 排序 | decs |
+| var_name | string | 是 | 变量名 | list_data |
+
+**curl 调用示例**:
+
+```bash
+# 获取A+H股实时行情
+curl -X GET "http://stock.gtimg.cn/data/hk_rank.php?board=A_H&metric=price&pageSize=20&reqPage=1&order=decs&var_name=list_data"
+```
+
+---
+
+### 14. A+H股历史行情数据（腾讯）
+
+**接口名称**: A+H股历史K线数据
+
+**数据源**: 腾讯财经
+
+**目标地址**: http://web.ifzq.gtimg.cn/appstock/app/hkfqkline/get
+
+**描述**: 获取 A+H 股个股的历史行情数据（后复权）
+
+**请求方式**: GET
+
+**输入参数**:
+| 参数名 | 类型 | 必填 | 说明 | 示例值 |
+|--------|------|------|------|--------|
+| _var | string | 是 | 变量名 | kline_dayhfq{symbol} |
+| param | string | 是 | 参数 | hk{symbol},day,{start_year}-01-01,{end_year}-12-31,640,hfq |
+| r | string | 是 | 随机数 | 空 |
+
+**curl 调用示例**:
+
+```bash
+# 获取A+H股历史行情数据
+curl -X GET "http://web.ifzq.gtimg.cn/appstock/app/hkfqkline/get?_var=kline_dayhfq02318&param=hk02318,day,2020-01-01,2026-12-31,640,hfq&r="
+```
+
+---
+
+### 15. CDR个股历史行情数据（新浪）
+
+**接口名称**: CDR历史K线数据
+
+**数据源**: 新浪财经
+
+**目标地址**: https://finance.sina.com.cn/realstock/company/{symbol}/hisdata_klc2/klc_kl.js
+
+**描述**: 获取 CDR 个股的历史行情数据
+
+**请求方式**: GET
+
+**输入参数**:
+| 参数名 | 类型 | 必填 | 说明 | 示例值 |
+|--------|------|------|------|--------|
+| symbol | string | 是 | 股票代码（带市场前缀） | sh689009 |
+
+**curl 调用示例**:
+
+```bash
+# 获取CDR个股历史行情数据
+curl -X GET "https://finance.sina.com.cn/realstock/company/sh689009/hisdata_klc2/klc_kl.js"
+```
+
+---
+
 ## 注意事项
 
 1. 所有接口均为公开数据源，无需认证
