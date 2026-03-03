@@ -2,12 +2,12 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的学术研究数据接口。所有接口均来自 Policy Uncertainty、Fama-French 等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的学术研究数据接口。所有接口均来自 Policy Uncertainty、Fama-French 等公开数据源。
 
 ## 重要说明
 
-- 所有接口均为 HTTP GET 请求
-- 返回格式为 CSV/Excel/HTML
+- 所有接口均为 Python 函数调用
+- 返回格式为 pandas.DataFrame
 - 数据来源：Policy Uncertainty、Dartmouth 等公开 API
 - 数据仅供学术研究使用，不构成投资建议
 
@@ -60,14 +60,22 @@
 | EPU | 经济政策不确定性指数 |
 | ... | 其他相关字段 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "http://www.policyuncertainty.com/media/SCMP_China_Policy_Uncertainty_Data.csv"
+```python
+import akshare as ak
 
-curl -s "http://www.policyuncertainty.com/media/US_Policy_Uncertainty_Data.csv"
+# 获取中国经济政策不确定性指数
+df = ak.article_epu_index(symbol="China")
+print(df)
 
-curl -s "http://www.policyuncertainty.com/media/Europe_Policy_Uncertainty_Data.csv"
+# 获取美国经济政策不确定性指数
+df = ak.article_epu_index(symbol="US")
+print(df)
+
+# 获取欧洲经济政策不确定性指数
+df = ak.article_epu_index(symbol="Europe")
+print(df)
 ```
 
 ---
@@ -92,36 +100,14 @@ curl -s "http://www.policyuncertainty.com/media/Europe_Policy_Uncertainty_Data.c
 | EPU | 经济政策不确定性指数 |
 | ... | 其他相关字段 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "http://www.policyuncertainty.com/media/HK_EPU_Data_Annotated.xlsx" -o china_epu.xlsx
-```
+```python
+import akshare as ak
 
----
-
-### 3. Fama-French多因子模型数据
-
-**接口名称**: Fama-French多因子模型
-
-**数据源**: Dartmouth College
-
-**目标地址**: https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html
-
-**描述**: 获取Fama-French多因子模型数据
-
-**请求方式**: GET
-
-**返回字段说明**:
-| 字段 | 说明 |
-|------|------|
-| item | 因子名称 |
-| - | 不同期限的因子值 |
-
-**curl 调用示例**:
-
-```bash
-curl -s "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html" -H "User-Agent: Mozilla/5.0"
+# 获取Fama-French多因子模型数据
+df = ak.article_ff_crr()
+print(df)
 ```
 
 ---
@@ -138,10 +124,14 @@ curl -s "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.ht
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS" -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取FRED波动率指数数据
+df = ak.article_oman_rv(symbol="VIX")
+print(df)
 ```
 
 ---

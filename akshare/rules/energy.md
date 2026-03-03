@@ -2,12 +2,12 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的能源数据接口。所有接口均来自东方财富网、碳排放交易所等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的能源数据接口。所有接口均来自东方财富网、碳排放交易所等公开数据源。
 
 ## 重要说明
 
-- 所有接口均为 HTTP GET 请求
-- 返回格式为 JSON
+- 所有接口均为 Python 函数调用
+- 返回格式为 pandas.DataFrame
 - 数据来源：东方财富网、各碳排放交易所公开 API
 - 数据仅供学术研究使用，不构成投资建议
 
@@ -48,10 +48,10 @@
 | 汽油涨跌 | 汽油涨跌幅度 |
 | 柴油涨跌 | 柴油涨跌幅度 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WEB_YJ_BD&columns=ALL&sortColumns=dim_date&sortTypes=-1&token=894050c76af8597a853f5b408b759f5d&pageNumber=1&pageSize=1000&source=WEB"
+```python
+import akshare as ak
 ```
 
 ---
@@ -95,10 +95,10 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WE
 | ZDE_95 | 95号汽油涨跌 |
 | ZDE_89 | 89号汽油涨跌 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WEB_YJ_JH&columns=ALL&filter=(dim_date='2024-01-18')&sortColumns=cityname&sortTypes=1&token=894050c76af8597a853f5b408b759f5d&pageNumber=1&pageSize=1000&source=WEB"
+```python
+import akshare as ak
 ```
 
 ---
@@ -140,10 +140,10 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WE
 - 深圳
 - 福建
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "http://k.tanjiaoyi.com:8080/KDataController/getHouseDatasInAverage.do?lcnK=53f75bfcefff58e4046ccfa42171636c&brand=TAN"
+```python
+import akshare as ak
 ```
 
 ---
@@ -169,10 +169,10 @@ curl -s "http://k.tanjiaoyi.com:8080/KDataController/getHouseDatasInAverage.do?l
 | 成交额 | 成交金额 |
 | 成交单位 | 成交单位 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://www.bjets.com.cn/article/jyxx/" -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
 ```
 
 ---
@@ -201,10 +201,10 @@ curl -s "https://www.bjets.com.cn/article/jyxx/" -H "User-Agent: Mozilla/5.0"
 | 成交量 | 成交量(吨) |
 | 成交额 | 成交金额 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "http://www.cerx.cn/dailynewsCN/index.htm" -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
 ```
 
 ---
@@ -233,10 +233,10 @@ curl -s "http://www.cerx.cn/dailynewsCN/index.htm" -H "User-Agent: Mozilla/5.0"
 | 成交量 | 成交量 |
 | 成交额 | 成交额 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "http://www.cerx.cn/dailynewsOuter/index.htm" -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
 ```
 
 ---
@@ -262,10 +262,10 @@ curl -s "http://www.cerx.cn/dailynewsOuter/index.htm" -H "User-Agent: Mozilla/5.
 | 最新 | 最新价 |
 | 涨跌 | 涨跌幅度 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://www.hbets.cn/" -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
 ```
 
 ---
@@ -303,10 +303,10 @@ curl -s "https://www.hbets.cn/" -H "User-Agent: Mozilla/5.0"
 | 成交数量 | 成交量(吨) |
 | 成交金额 | 成交金额 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "http://ets.cnemission.com/carbon/portalIndex/markethistory?Top=1&beginTime=2010-01-01&endTime=2030-09-12"
+```python
+import akshare as ak
 ```
 
 ---

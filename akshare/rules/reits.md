@@ -2,12 +2,12 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的 REITs（不动产投资信托基金）数据接口。所有接口均来自东方财富网等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的 REITs（不动产投资信托基金）数据接口。所有接口均来自东方财富网等公开数据源。
 
 ## 重要说明
 
-- 所有接口均为 HTTP GET 请求
-- 返回格式为 JSON
+- 所有接口均为 Python 函数调用
+- 返回格式为 pandas.DataFrame
 - 数据来源：东方财富网公开 API
 - 数据仅供学术研究使用，不构成投资建议
 
@@ -57,10 +57,14 @@
 | 最低价 | 今日最低价 |
 | 昨收 | 昨日收盘价 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://95.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f3&fs=m:1+t:9+e:97,m:0+t:10+e:97&fields=f2,f3,f4,f5,f6,f12,f14,f15,f16,f17,f18"
+```python
+import akshare as ak
+
+# 获取沪深REITs实时行情数据
+df = ak.reits_realtime_em()
+print(df)
 ```
 
 ---
@@ -104,10 +108,14 @@ curl -s "https://95.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=100&po=1&np=1&u
 | 振幅 | 振幅(%) |
 | 换手 | 换手率(%) |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.508097&klt=101&fqt=1&lmt=10000&end=20500000&iscca=1&fields1=f1,f2,f3,f4,f5,f6,f7,f8&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64&ut=f057cbcbce2a86e2866ab8877db1d059&forcect=1"
+```python
+import akshare as ak
+
+# 获取REITs历史K线数据
+df = ak.reits_hist_em(symbol="508097")
+print(df)
 ```
 
 ---
@@ -146,10 +154,14 @@ curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.508097&kl
 | 成交额 | 成交金额 |
 | 昨收 | 昨日收盘价 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://push2.eastmoney.com/api/qt/stock/trends2/get?secid=1.508097&fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f17&fields2=f51,f53,f54,f55,f56,f57,f58&iscr=0&iscca=0&ut=f057cbcbce2a86e2866ab8877db1d059&ndays=5"
+```python
+import akshare as ak
+
+# 获取REITs分时数据
+df = ak.reits_hist_min_em(symbol="508097")
+print(df)
 ```
 
 ---

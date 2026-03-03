@@ -2,12 +2,12 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的空气质量数据接口。所有接口均来自河北省空气质量预报信息发布系统等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的空气质量数据接口。所有接口均来自河北省空气质量预报信息发布系统等公开数据源。
 
 ## 重要说明
 
-- 所有接口均为 HTTP GET 请求
-- 返回格式为 XML/JSON
+- 所有接口均为 Python 函数调用
+- 返回格式为 pandas.DataFrame
 - 数据来源：河北省环境应急与重污染天气预警中心等公开 API
 - 数据仅供学术研究使用
 
@@ -54,10 +54,14 @@
 | PM10_浓度 | PM10浓度(μg/m³) |
 | PM10_IAQI | PM10空气质量分指数 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "http://218.11.10.130:8080/api/hour/130000.xml"
+```python
+import akshare as ak
+
+# 获取河北省空气质量实时数据
+df = ak.air_quality_hebei()
+print(df)
 ```
 
 ---

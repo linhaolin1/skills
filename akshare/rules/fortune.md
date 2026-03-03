@@ -2,12 +2,12 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的财富榜单数据接口。所有接口均来自财富中文网、胡润研究院等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的财富榜单数据接口。所有接口均来自财富中文网、胡润研究院等公开数据源。
 
 ## 重要说明
 
-- 所有接口均为 HTTP GET 请求
-- 返回格式为 HTML/JSON
+- 所有接口均为 Python 函数调用
+- 返回格式为 pandas.DataFrame
 - 数据来源：财富中文网、胡润研究院公开 API
 - 数据仅供学术研究使用，不构成投资建议
 
@@ -38,10 +38,14 @@
 | 国家 | 公司所属国家 |
 | 行业 | 公司所属行业 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://www.fortunechina.com/fortune500/c/2023-08/02/content_436874.htm" -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取财富世界500强榜单数据
+df = ak.fortune_rank(year="2023")
+print(df)
 ```
 
 ---
@@ -75,10 +79,14 @@ curl -s "https://www.fortunechina.com/fortune500/c/2023-08/02/content_436874.htm
 | 企业 | 所属企业 |
 | 行业 | 所属行业 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://www.hurun.net/zh-CN/Rank/HsRankDetailsList?num=YUB8E8E5&search=&offset=0&limit=20000" -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取胡润百富榜数据
+df = ak.hurun_rank(indicator="胡润百富榜", year="2023")
+print(df)
 ```
 
 ---
@@ -104,10 +112,14 @@ curl -s "https://www.hurun.net/zh-CN/Rank/HsRankDetailsList?num=YUB8E8E5&search=
 | 企业 | 所属企业 |
 | 行业 | 所属行业 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://www.hurun.net/zh-CN/Rank/HsRankDetailsList?num=YEAR_CODE&search=&offset=0&limit=20000" -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取胡润全球富豪榜数据
+df = ak.hurun_rank(indicator="胡润全球富豪榜", year="2023")
+print(df)
 ```
 
 ---
@@ -133,10 +145,14 @@ curl -s "https://www.hurun.net/zh-CN/Rank/HsRankDetailsList?num=YEAR_CODE&search
 | 企业 | 企业名称 |
 | 行业 | 所属行业 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://www.hurun.net/zh-CN/Rank/HsRankDetailsList?num=YEAR_CODE&search=&offset=0&limit=20000" -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取胡润全球独角兽榜数据
+df = ak.hurun_rank(indicator="胡润全球独角兽榜", year="2023")
+print(df)
 ```
 
 ---
@@ -163,10 +179,14 @@ curl -s "https://www.hurun.net/zh-CN/Rank/HsRankDetailsList?num=YEAR_CODE&search
 | CEO | 企业CEO |
 | 行业 | 所属行业 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://www.hurun.net/zh-CN/Rank/HsRankDetailsList?num=YEAR_CODE&search=&offset=0&limit=20000" -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取胡润中国500强民营企业榜单数据
+df = ak.hurun_rank(indicator="胡润中国500强民营企业", year="2023")
+print(df)
 ```
 
 ---
@@ -193,10 +213,14 @@ curl -s "https://www.hurun.net/zh-CN/Rank/HsRankDetailsList?num=YEAR_CODE&search
 | CEO | 企业CEO |
 | 行业 | 所属行业 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://www.hurun.net/zh-CN/Rank/HsRankDetailsList?num=YEAR_CODE&search=&offset=0&limit=20000" -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取胡润世界500强榜单数据
+df = ak.hurun_rank(indicator="胡润世界500强", year="2023")
+print(df)
 ```
 
 ---
@@ -223,10 +247,14 @@ curl -s "https://www.hurun.net/zh-CN/Rank/HsRankDetailsList?num=YEAR_CODE&search
 | 年龄 | 艺术家年龄 |
 | 艺术类别 | 艺术类别 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://www.hurun.net/zh-CN/Rank/HsRankDetailsList?num=YEAR_CODE&search=&offset=0&limit=20000" -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取胡润艺术榜数据
+df = ak.hurun_rank(indicator="胡润艺术榜", year="2023")
+print(df)
 ```
 
 ---
@@ -251,10 +279,14 @@ curl -s "https://www.hurun.net/zh-CN/Rank/HsRankDetailsList?num=YEAR_CODE&search
 | 企业总部 | 企业总部所在地 |
 | 行业 | 所属行业 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://www.hurun.net/zh-CN/Rank/HsRankDetailsList?num=YEAR_CODE&search=&offset=0&limit=20000" -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取瞪羚企业榜数据
+df = ak.hurun_rank(indicator="中国瞪羚企业榜", year="2023")
+print(df)
 ```
 
 ---

@@ -2,12 +2,12 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的期货数据接口。所有接口均来自东方财富网等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的期货数据接口。所有接口均来自东方财富网等公开数据源。
 
 ## 重要说明
 
-- 所有接口均为 HTTP GET 请求
-- 返回格式为 JSON
+- 所有接口均为 Python 函数调用
+- 返回格式为 pandas.DataFrame
 - 数据来源：东方财富网公开 API
 - 数据仅供学术研究使用，不构成投资建议
 
@@ -55,14 +55,14 @@
 | 涨跌 | 涨跌额 |
 | 持仓量 | 持仓量 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取热卷主连日线数据
-curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=142.DCEhc&klt=101&fqt=1&lmt=10000&end=20500000&iscca=1&fields1=f1,f2,f3,f4,f5,f6,f7,f8&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64&ut=7eea3edcaed734bea9cbfc24409ed989&forcect=1"
+```python
+import akshare as ak
 
-# 获取螺纹钢主连日线数据
-curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=138.DCErb&klt=101&fqt=1&lmt=10000&end=20500000&iscca=1&fields1=f1,f2,f3,f4,f5,f6,f7,f8&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64&ut=7eea3edcaed734bea9cbfc24409ed989&forcect=1"
+# 获取期货历史K线数据
+df = ak.futures_zh_daily_sina(symbol="RB0")
+print(df)
 ```
 
 ---
@@ -84,11 +84,14 @@ curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=138.DCErb&k
 |--------|------|------|------|--------|
 | msgid | string | 是 | 消息ID | gnweb 或具体市场ID |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取所有期货品种映射
-curl -s "https://futsse-static.eastmoney.com/redis?msgid=gnweb"
+```python
+import akshare as ak
+
+# 获取期货品种映射数据
+df = ak.futures_symbol_mark()
+print(df)
 ```
 
 ---
@@ -113,11 +116,14 @@ curl -s "https://futsse-static.eastmoney.com/redis?msgid=gnweb"
 | fields2 | string | 是 | 字段2 | f51,f52,f53,f54,f55,f56,f57,f58 |
 | ut | string | 是 | 用户标识 | 7eea3edcaed734bea9cbfc24409ed989 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取期货分时数据
-curl -s "https://push2his.eastmoney.com/api/qt/stock/trends2/get?secid=142.DCEhc&fields1=f1,f2,f3,f4,f5,f6,f7,f8&fields2=f51,f52,f53,f54,f55,f56,f57,f58&ut=7eea3edcaed734bea9cbfc24409ed989"
+df = ak.futures_zh_minute_sina(symbol="IF2008")
+print(df)
 ```
 
 ---
@@ -154,11 +160,14 @@ curl -s "https://push2his.eastmoney.com/api/qt/stock/trends2/get?secid=142.DCEhc
 | 库存 | 库存数量 |
 | 增减 | 库存增减 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取豆一库存数据
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_FUTU_STOCKDATA&columns=SECURITY_CODE,TRADE_DATE,ON_WARRANT_NUM,ADDCHANGE&filter=(SECURITY_CODE%3D%22a%22)(TRADE_DATE%3E%3D'2020-10-28')&pageNumber=1&pageSize=500&sortTypes=-1&sortColumns=TRADE_DATE&source=WEB&client=WEB"
+```python
+import akshare as ak
+
+# 获取期货库存数据
+df = ak.futures_inventory_em(symbol="a")
+print(df)
 ```
 
 ---
@@ -175,11 +184,14 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_FUT
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取国际期货列表
-curl -s "https://23.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f3&fs=m:113,m:114,m:115,m:8,m:9&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18"
+```python
+import akshare as ak
+
+# 获取国际期货实时行情数据
+df = ak.futures_global_spot_em()
+print(df)
 ```
 
 ---

@@ -2,12 +2,12 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的宏观经济数据接口。所有接口均来自东方财富网、金十数据等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的宏观经济数据接口。所有接口均来自东方财富网、金十数据等公开数据源。
 
 ## 重要说明
 
-- 所有接口均为 HTTP GET 请求
-- 返回格式为 JSON
+- 所有接口均为 Python 函数调用
+- 返回格式为 pandas.DataFrame
 - 数据来源：东方财富网、金十数据公开 API
 - 数据仅供学术研究使用，不构成投资建议
 
@@ -43,14 +43,14 @@
 | RPT_ECONOMY_PPI | PPI数据 |
 | RPT_ECONOMY_PMI | PMI数据 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取GDP数据
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_ECONOMY_GDP&columns=ALL&source=WEB&client=WEB"
+```python
+import akshare as ak
 
-# 获取CPI数据
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_ECONOMY_CPI&columns=ALL&source=WEB&client=WEB"
+# 获取中国宏观经济数据
+df = ak.macro_china_gdp()
+print(df)
 ```
 
 ---
@@ -67,13 +67,14 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_ECO
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取美国非农数据（示例）
-curl -s "https://datacenter-api.jin10.com/data_center/economic/us_nonfarm" \
-  -H "X-App-Id: lnFP5lxse24wPgtY" \
-  -H "X-Version: 1.0.0"
+```python
+import akshare as ak
+
+# 获取美国宏观经济数据
+df = ak.macro_usa_gdp_monthly()
+print(df)
 ```
 
 ---
@@ -90,11 +91,14 @@ curl -s "https://datacenter-api.jin10.com/data_center/economic/us_nonfarm" \
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取货币供应量数据
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_ECONOMY_MONEY_SUPPLY&columns=ALL&source=WEB&client=WEB"
+```python
+import akshare as ak
+
+# 获取中国货币供应量数据
+df = ak.macro_china_money_supply()
+print(df)
 ```
 
 ---
@@ -111,11 +115,14 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_ECO
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取社会融资规模数据
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_ECONOMY_SOCIAL_FINANCING&columns=ALL&source=WEB&client=WEB"
+df = ak.macro_china_bank_financing()
+print(df)
 ```
 
 ---

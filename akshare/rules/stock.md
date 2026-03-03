@@ -2,7 +2,7 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的股票数据接口。所有接口均来自东方财富网等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的股票数据接口。所有接口均来自东方财富网等公开数据源。
 
 ## 重要说明
 
@@ -76,27 +76,37 @@
 10. 涨跌额（元）
 11. 换手率（%）
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 查询中钨高新(000657)最近的日线数据（前复权）
-curl -X GET "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.000657&beg=20240220&end=20260301"
+df = ak.stock_zh_a_hist(symbol="000657", period="daily", start_date="20240220", end_date="20260301", adjust="qfq")
+print(df)
 
 # 查询贵州茅台(600519)周线数据（不复权）
-curl -X GET "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=102&fqt=0&secid=1.600519&beg=20240101&end=20241231"
+df = ak.stock_zh_a_hist(symbol="600519", period="weekly", start_date="20240101", end_date="20241231", adjust="")
+print(df)
 
 # 查询平安银行(000001)月线数据（后复权）
-curl -X GET "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=103&fqt=2&secid=0.000001&beg=20230101&end=20241231"
+df = ak.stock_zh_a_hist(symbol="000001", period="monthly", start_date="20230101", end_date="20241231", adjust="hfq")
+print(df)
 ```
 
-**数据处理示例**（使用 jq）:
+**数据处理示例**:
 
-```bash
+```python
+import akshare as ak
+
+# 获取数据
+df = ak.stock_zh_a_hist(symbol="000657", period="daily", start_date="20240220", end_date="20260301", adjust="qfq")
+
 # 提取最近5天的收盘价
-curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.000657&beg=20240220&end=20260301" | jq -r '.data.klines[-5:] | .[]'
+print(df.tail(5)["收盘"])
 
-# 提取股票名称和代码
-curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.000657&beg=20240220&end=20260301" | jq '.data | {code, name}'
+# 提取股票代码和名称
+print(df["股票代码"].iloc[0])
 ```
 
 ---
@@ -149,14 +159,19 @@ curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,
 | f20 | 总市值 |
 | f21 | 流通市值 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取所有A股实时行情
-curl -X GET "https://82.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=5000&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,f136,f115,f152"
+df = ak.stock_zh_a_spot_em()
+print(df)
 
-# 使用 jq 查找中钨高新的实时行情
-curl -s "https://82.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=5000&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,f136,f115,f152" | jq '.data.diff[] | select(.f14 == "中钨高新")'
+# 查找中钨高新的实时行情
+df = ak.stock_zh_a_spot_em()
+stock_info = df[df["代码"] == "000657"]
+print(stock_info)
 ```
 
 ---
@@ -180,11 +195,14 @@ curl -s "https://82.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=5000&po=1&np=1&
 | fields | string | 是 | 返回字段 | f43,f57,f58,f169,f170,f46,f44,f51,f168,f47,f164,f163,f116,f60,f45,f52,f50,f48,f167,f117,f71,f161,f49,f530,f135,f136,f137,f138,f139,f141,f142,f144,f145,f147,f148,f140,f143,f146,f149,f55,f62,f162,f92,f173,f104,f105,f84,f85,f183,f184,f185,f186,f187,f188,f189,f190,f191,f192,f107,f111,f86,f177,f78,f110,f262,f263,f264,f267,f268,f250,f251,f252,f253,f254,f255,f256,f257,f258,f266,f269,f270,f271,f273,f274,f275,f127,f199,f128,f198,f259,f260,f261,f171,f277,f278,f279,f288,f152,f250,f251,f252,f253,f254,f255,f256,f257,f258 |
 | secid | string | 是 | 证券ID | 0.000657 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取中钨高新实时行情
-curl -X GET "https://push2.eastmoney.com/api/qt/stock/get?ut=fa5fd1943c7b386f172d6893dbfba10b&invt=2&fltt=2&fields=f43,f57,f58,f169,f170,f46,f44,f51,f168,f47,f164,f163,f116,f60,f45,f52,f50,f48,f167,f117,f71,f161,f49,f530,f135,f136,f137,f138,f139,f141,f142,f144,f145,f147,f148,f140,f143,f146,f149,f55,f62,f162,f92,f173,f104,f105,f84,f85,f183,f184,f185,f186,f187,f188,f189,f190,f191,f192,f107,f111,f86,f177,f78,f110,f262,f263,f264,f267,f268&secid=0.000657"
+df = ak.stock_individual_info_em(symbol="000657")
+print(df)
 ```
 
 ---
@@ -239,11 +257,14 @@ curl -X GET "https://push2.eastmoney.com/api/qt/stock/get?ut=fa5fd1943c7b386f172
 | mediaName | 文章来源 |
 | code | 文章代码 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取中钨高新(000657)个股新闻
-curl -s "https://search-api-web.eastmoney.com/search/jsonp?cb=jQuery35101792940631092459_1764599530165&param=%7B%22uid%22%3A%22%22%2C%22keyword%22%3A%22000657%22%2C%22type%22%3A%5B%22cmsArticleWebOld%22%5D%2C%22client%22%3A%22web%22%2C%22clientType%22%3A%22web%22%2C%22clientVersion%22%3A%22curr%22%2C%22param%22%3A%7B%22cmsArticleWebOld%22%3A%7B%22searchScope%22%3A%22default%22%2C%22sort%22%3A%22default%22%2C%22pageIndex%22%3A1%2C%22pageSize%22%3A10%2C%22preTag%22%3A%22%3Cem%3E%22%2C%22postTag%22%3A%22%3C%2Fem%3E%22%7D%7D%7D&_=1764599530176"
+df = ak.stock_news_em(symbol="000657")
+print(df)
 ```
 
 ---
@@ -286,11 +307,14 @@ curl -s "https://search-api-web.eastmoney.com/search/jsonp?cb=jQuery351017929406
 | BILLBOARD_SELL_AMT | 龙虎榜卖出额 |
 | TURNOVERRATE | 换手率 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取2026年2月龙虎榜数据
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?sortColumns=SECURITY_CODE,TRADE_DATE&sortTypes=1,-1&pageSize=5000&pageNumber=1&reportName=RPT_DAILYBILLBOARD_DETAILSNEW&columns=ALL&source=WEB&client=WEB&filter=(TRADE_DATE<='2026-02-28')(TRADE_DATE>='2026-02-01')"
+df = ak.stock_lhb_detail_em(start_date="20260201", end_date="20260228")
+print(df)
 ```
 
 ---
@@ -331,11 +355,14 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?sortColumns=SECURI
 | 预案公告日 | 公告日期 |
 | 方案进度 | 方案状态 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取2025年报分红送配数据
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?sortColumns=PLAN_NOTICE_DATE&sortTypes=-1&pageSize=500&pageNumber=1&reportName=RPT_SHAREBONUS_DET&columns=ALL&source=WEB&client=WEB&filter=(REPORT_DATE='2025-12-31')"
+df = ak.stock_fhps_em(date="20251231")
+print(df)
 ```
 
 ---
@@ -377,11 +404,14 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?sortColumns=PLAN_N
 | 资金净流入 | 净流入金额 |
 | 当日资金余额 | 剩余额度 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取沪深港通资金流向
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_MUTUAL_QUOTA&columns=TRADE_DATE,MUTUAL_TYPE,BOARD_TYPE,MUTUAL_TYPE_NAME,FUNDS_DIRECTION,INDEX_CODE,INDEX_NAME,BOARD_CODE&quoteColumns=status~07~BOARD_CODE,dayNetAmtIn~07~BOARD_CODE,dayAmtRemain~07~BOARD_CODE,dayAmtThreshold~07~BOARD_CODE,f104~07~BOARD_CODE,f105~07~BOARD_CODE,f106~07~BOARD_CODE,f3~03~INDEX_CODE~INDEX_f3,netBuyAmt~07~BOARD_CODE&quoteType=0&pageNumber=1&pageSize=2000&sortTypes=1&sortColumns=MUTUAL_TYPE&source=WEB&client=WEB"
+df = ak.stock_hsgt_fund_flow_summary_em()
+print(df)
 ```
 
 ---
@@ -425,11 +455,14 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_MUT
 | 下跌家数 | 板块内下跌股票数 |
 | 领涨股票 | 板块领涨股票名称 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取行业板块实时行情
-curl -s "https://17.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f3&fs=m:90+t:2+f:!50&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f26,f22,f33,f11,f62,f128,f136,f115,f152,f124,f107,f104,f105,f140,f141,f207,f208,f209,f222"
+df = ak.stock_board_industry_name_em()
+print(df)
 ```
 
 ---
@@ -460,11 +493,14 @@ curl -s "https://17.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=100&po=1&np=1&u
 | fs | string | 是 | 市场筛选 | m:90 t:3 f:!50 |
 | fields | string | 是 | 返回字段 | 见下方说明 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取概念板块实时行情
-curl -s "https://79.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m:90+t:3+f:!50&fields=f2,f3,f4,f8,f12,f14,f15,f16,f17,f18,f20,f21,f24,f25,f22,f33,f11,f62,f128,f124,f107,f104,f105,f136"
+df = ak.stock_board_concept_name_em()
+print(df)
 ```
 
 ---
@@ -504,11 +540,14 @@ curl -s "https://79.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=100&po=1&np=1&u
 | 担保物总价值 | 担保物总价值 |
 | 平均维持担保比例 | 平均维持担保比例 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取融资融券账户统计
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WEB_MARGIN_DAILYTRADE&columns=ALL&pageNumber=1&pageSize=500&sortColumns=STATISTICS_DATE&sortTypes=-1"
+df = ak.stock_margin_account_info()
+print(df)
 ```
 
 ---
@@ -547,11 +586,14 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WE
 | 净利润同比增长 | 净利润同比增长率 |
 | 净资产收益率 | ROE |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取2025年报业绩快报
-curl -s "https://datacenter.eastmoney.com/securities/api/data/v1/get?sortColumns=UPDATE_DATE,SECURITY_CODE&sortTypes=-1,-1&pageSize=500&pageNumber=1&reportName=RPT_FCI_PERFORMANCEE&columns=ALL&filter=(SECURITY_TYPE_CODE%20in%20(%22058001001%22,%22058001008%22))(TRADE_MARKET_CODE!%3D%22069001017%22)(REPORT_DATE%3D'2025-12-31')"
+df = ak.stock_yjkb_em(date="20251231")
+print(df)
 ```
 
 ---
@@ -581,11 +623,14 @@ curl -s "https://datacenter.eastmoney.com/securities/api/data/v1/get?sortColumns
 | client | string | 是 | 客户端 | WEB |
 | filter | string | 是 | 筛选条件 | 报告期 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取十大流通股东统计
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?sortColumns=STATISTICS_TIMES,COOPERATION_HOLDER_MARK&sortTypes=-1,-1&pageSize=500&pageNumber=1&reportName=RPT_COOPFREEHOLDERS_ANALYSIS&columns=ALL&source=WEB&client=WEB&filter=(HOLDNUM_CHANGE_TYPE%3D%22001%22)(END_DATE%3D'2025-06-30')"
+df = ak.stock_gdfx_holding_statistics_em(date="20250630")
+print(df)
 ```
 
 ---
@@ -594,83 +639,52 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?sortColumns=STATIS
 
 ### 示例1：查询中钨高新最近5天行情
 
-```bash
-#!/bin/bash
+```python
+import akshare as ak
 
-# 股票信息
-STOCK_CODE="000657"
-STOCK_NAME="中钨高新"
-MARKET_CODE="0"  # 深圳市场
-
-# 日期范围（最近15天，确保包含5个交易日）
-END_DATE=$(date +%Y%m%d)
-START_DATE=$(date -v-15d +%Y%m%d)  # macOS
-# START_DATE=$(date -d "15 days ago" +%Y%m%d)  # Linux
-
-echo "查询 ${STOCK_NAME}(${STOCK_CODE}) 最近行情..."
-echo "日期范围: ${START_DATE} - ${END_DATE}"
-echo ""
-
-# 调用API
-curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=${MARKET_CODE}.${STOCK_CODE}&beg=${START_DATE}&end=${END_DATE}" | jq -r '
-  .data | 
-  "股票: \(.name) (\(.code))",
-  "",
-  "最近5天行情:",
-  "日期,开盘,收盘,最高,最低,成交量,成交额,振幅,涨跌幅,涨跌额,换手率",
-  (.klines[-5:] | .[])
-'
+# 查询中钨高新最近5天行情
+df = ak.stock_zh_a_hist(symbol="000657", period="daily", start_date="20240220", end_date="20260301", adjust="qfq")
+print("股票代码:", df["股票代码"].iloc[0])
+print("\n最近5天行情:")
+print(df.tail(5))
 ```
 
 ### 示例2：查询实时价格并计算涨跌
 
-```bash
-#!/bin/bash
+```python
+import akshare as ak
 
 # 获取中钨高新实时行情
-echo "查询中钨高新实时行情..."
-
-curl -s "https://82.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=5000&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23" | jq -r '
-  .data.diff[] | 
-  select(.f14 == "中钨高新") | 
-  "股票代码: \(.f12)",
-  "股票名称: \(.f14)",
-  "最新价: \(.f2)",
-  "涨跌幅: \(.f3)%",
-  "涨跌额: \(.f4)",
-  "今开: \(.f17)",
-  "昨收: \(.f18)",
-  "最高: \(.f15)",
-  "最低: \(.f16)",
-  "成交量: \(.f5)手",
-  "成交额: \(.f6)元",
-  "换手率: \(.f8)%",
-  "市盈率: \(.f9)",
-  "市净率: \(.f23)"
-'
+df = ak.stock_zh_a_spot_em()
+stock_info = df[df["代码"] == "000657"].iloc[0]
+print("股票代码:", stock_info["代码"])
+print("股票名称:", stock_info["名称"])
+print("最新价:", stock_info["最新价"])
+print("涨跌幅:", stock_info["涨跌幅"], "%")
+print("涨跌额:", stock_info["涨跌额"])
+print("今开:", stock_info["今开"])
+print("昨收:", stock_info["昨收"])
+print("最高:", stock_info["最高"])
+print("最低:", stock_info["最低"])
+print("成交量:", stock_info["成交量"])
+print("成交额:", stock_info["成交额"])
+print("换手率:", stock_info["换手率"])
 ```
 
 ### 示例3：对比多只股票
 
-```bash
-#!/bin/bash
+```python
+import akshare as ak
 
 # 对比中钨高新和贵州茅台
-echo "对比股票行情..."
-
-for stock in "0.000657:中钨高新" "1.600519:贵州茅台"; do
-  IFS=':' read -r secid name <<< "$stock"
-  echo ""
-  echo "=== ${name} ==="
-  
-  curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=${secid}&beg=20240220&end=20260301" | jq -r '
-    .data.klines[-1] | 
-    split(",") | 
-    "日期: \(.[0])",
-    "收盘价: \(.[2])",
-    "涨跌幅: \(.[8])%"
-  '
-done
+stocks = ["000657", "600519"]
+for stock_code in stocks:
+    df = ak.stock_zh_a_hist(symbol=stock_code, period="daily", start_date="20240220", end_date="20260301", adjust="qfq")
+    latest = df.iloc[-1]
+    print(f"=== {stock_code} ===")
+    print(f"日期: {latest['日期']}")
+    print(f"收盘价: {latest['收盘']}")
+    print(f"涨跌幅: {latest['涨跌幅']}%\n")
 ```
 
 ---
@@ -731,11 +745,14 @@ done
 | 成交额 | 成交额 |
 | 时间戳 | 时间戳 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取A股实时行情第一页
-curl -X GET "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=80&sort=symbol&asc=1&node=hs_a&symbol=&_s_r_a=page"
+```python
+import akshare as ak
+
+# 获取所有A股实时行情
+df = ak.stock_zh_a_spot()
+print(df)
 ```
 
 ---
@@ -772,14 +789,14 @@ curl -X GET "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php
 | volume | 成交量 |
 | amount | 成交额 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取贵州茅台(sh600519)历史行情数据
-curl -X GET "https://finance.sina.com.cn/realstock/company/sh600519/hisdata_klc2/klc_kl.js"
-
-# 获取平安银行(sz000001)历史行情数据
-curl -X GET "https://finance.sina.com.cn/realstock/company/sz000001/hisdata_klc2/klc_kl.js"
+df = ak.stock_zh_a_hist(symbol="600519", period="daily", start_date="20240101", end_date="20241231")
+print(df)
 ```
 
 ---
@@ -803,14 +820,18 @@ curl -X GET "https://finance.sina.com.cn/realstock/company/sz000001/hisdata_klc2
 |--------|------|------|------|--------|
 | symbol | string | 是 | 股票代码（带市场前缀） | sh600519 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取贵州茅台前复权因子
-curl -X GET "https://finance.sina.com.cn/realstock/company/sh600519/qfq.js"
+```python
+import akshare as ak
 
-# 获取贵州茅台后复权因子
-curl -X GET "https://finance.sina.com.cn/realstock/company/sh600519/hfq.js"
+# 获取贵州茅台前复权历史数据
+df = ak.stock_zh_a_hist(symbol="600519", period="daily", start_date="20240101", end_date="20241231", adjust="qfq")
+print(df)
+
+# 获取贵州茅台后复权历史数据
+df = ak.stock_zh_a_hist(symbol="600519", period="daily", start_date="20240101", end_date="20241231", adjust="hfq")
+print(df)
 ```
 
 ---
@@ -846,14 +867,18 @@ curl -X GET "https://finance.sina.com.cn/realstock/company/sh600519/hfq.js"
 | volume | 成交量 |
 | amount | 成交额 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取贵州茅台1分钟K线数据
-curl -X GET "https://quotes.sina.cn/cn/api/jsonp_v2.php/=/CN_MarketDataService.getKLineData?symbol=sh600519&scale=1&ma=no&datalen=1970"
+df = ak.stock_zh_a_hist_min_em(symbol="600519", period="1")
+print(df)
 
 # 获取贵州茅台5分钟K线数据
-curl -X GET "https://quotes.sina.cn/cn/api/jsonp_v2.php/=/CN_MarketDataService.getKLineData?symbol=sh600519&scale=5&ma=no&datalen=1970"
+df = ak.stock_zh_a_hist_min_em(symbol="600519", period="5")
+print(df)
 ```
 
 ---
@@ -903,11 +928,14 @@ curl -X GET "https://quotes.sina.cn/cn/api/jsonp_v2.php/=/CN_MarketDataService.g
 | 总市值 | 总市值 |
 | 换手率 | 换手率 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取科创板实时行情
-curl -X GET "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=80&sort=symbol&asc=1&node=kcb&symbol=&_s_r_a=auto"
+df = ak.stock_kc_a_spot_em()
+print(df)
 ```
 
 ---
@@ -930,11 +958,14 @@ curl -X GET "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php
 | symbol | string | 是 | 股票代码（带市场前缀） | sh688399 |
 | date | string | 是 | 日期（格式：YYYY_MM_DD） | 2026_03_02 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取科创板股票历史行情
-curl -X GET "https://quotes.sina.cn/cn/api/jsonp.php/var%20_sh688399_2026_03_02=/KC_MarketDataService.getKLineData?symbol=sh688399"
+df = ak.stock_zh_a_hist(symbol="688399", period="daily", start_date="20240101", end_date="20241231")
+print(df)
 ```
 
 ---
@@ -960,11 +991,14 @@ curl -X GET "https://quotes.sina.cn/cn/api/jsonp.php/var%20_sh688399_2026_03_02=
 | asc | string | 是 | 升序排列 | 1 |
 | node | string | 是 | 节点 | b股 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取B股实时行情
-curl -X GET "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=80&sort=symbol&asc=1&node=b股"
+df = ak.stock_zh_b_spot_em()
+print(df)
 ```
 
 ---
@@ -1011,11 +1045,14 @@ curl -X GET "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php
 | 涨跌额 | 涨跌金额 |
 | 涨跌幅 | 涨跌百分比 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取港股实时行情
-curl -X GET "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHKStockData?page=1&num=60&sort=symbol&asc=1&node=qbgg_hk&_s_r_a=init"
+df = ak.stock_hk_spot_em()
+print(df)
 ```
 
 ---
@@ -1037,11 +1074,14 @@ curl -X GET "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php
 |--------|------|------|------|--------|
 | symbol | string | 是 | 股票代码 | 00700 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取腾讯控股(00700)历史行情数据
-curl -X GET "https://finance.sina.com.cn/stock/hkstock/00700/klc_kl.js"
+df = ak.stock_hk_hist(symbol="00700", period="daily", start_date="20240101", end_date="20241231")
+print(df)
 ```
 
 ---
@@ -1065,14 +1105,18 @@ curl -X GET "https://finance.sina.com.cn/stock/hkstock/00700/klc_kl.js"
 |--------|------|------|------|--------|
 | symbol | string | 是 | 股票代码 | 00700 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取腾讯控股前复权因子
-curl -X GET "https://finance.sina.com.cn/stock/hkstock/00700/qfq.js"
+```python
+import akshare as ak
 
-# 获取腾讯控股后复权因子
-curl -X GET "https://finance.sina.com.cn/stock/hkstock/00700/hfq.js"
+# 获取腾讯控股前复权历史数据
+df = ak.stock_hk_hist(symbol="00700", period="daily", start_date="20240101", end_date="20241231", adjust="qfq")
+print(df)
+
+# 获取腾讯控股后复权历史数据
+df = ak.stock_hk_hist(symbol="00700", period="daily", start_date="20240101", end_date="20241231", adjust="hfq")
+print(df)
 ```
 
 ---
@@ -1099,11 +1143,14 @@ curl -X GET "https://finance.sina.com.cn/stock/hkstock/00700/hfq.js"
 | market | string | 是 | 市场 | 空 |
 | id | string | 是 | 分类ID | 空 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取美股实时行情
-curl -X GET "http://stock.finance.sina.com.cn/usstock/api/jsonp.php/IO.XSRV2.CallbackList[123]/US_CategoryService.getList?page=1&num=20&sort=&asc=0&market=&id="
+df = ak.stock_us_spot_em()
+print(df)
 ```
 
 ---
@@ -1125,11 +1172,14 @@ curl -X GET "http://stock.finance.sina.com.cn/usstock/api/jsonp.php/IO.XSRV2.Cal
 |--------|------|------|------|--------|
 | symbol | string | 是 | 股票代码 | AAPL |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取苹果(AAPL)历史行情数据
-curl -X GET "https://finance.sina.com.cn/us_stock/company/hisdata/klc_kl_AAPL.js"
+df = ak.stock_us_hist(symbol="AAPL", period="daily", start_date="20240101", end_date="20241231")
+print(df)
 ```
 
 ---
@@ -1156,11 +1206,14 @@ curl -X GET "https://finance.sina.com.cn/us_stock/company/hisdata/klc_kl_AAPL.js
 | order | string | 是 | 排序 | decs |
 | var_name | string | 是 | 变量名 | list_data |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取A+H股实时行情
-curl -X GET "http://stock.gtimg.cn/data/hk_rank.php?board=A_H&metric=price&pageSize=20&reqPage=1&order=decs&var_name=list_data"
+df = ak.stock_zh_ah_spot_em()
+print(df)
 ```
 
 ---
@@ -1184,11 +1237,22 @@ curl -X GET "http://stock.gtimg.cn/data/hk_rank.php?board=A_H&metric=price&pageS
 | param | string | 是 | 参数 | hk{symbol},day,{start_year}-01-01,{end_year}-12-31,640,hfq |
 | r | string | 是 | 随机数 | 空 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取A+H股历史行情数据
-curl -X GET "http://web.ifzq.gtimg.cn/appstock/app/hkfqkline/get?_var=kline_dayhfq02318&param=hk02318,day,2020-01-01,2026-12-31,640,hfq&r="
+```python
+import akshare as ak
+
+# 获取A+H股历史行情数据（后复权）
+df = ak.stock_zh_ah_daily(symbol="02318", start_year="2020", end_year="2026", adjust="hfq")
+print(df)
+
+# 获取A+H股历史行情数据（前复权）
+df = ak.stock_zh_ah_daily(symbol="02318", start_year="2020", end_year="2026", adjust="qfq")
+print(df)
+
+# 获取A+H股历史行情数据（不复权）
+df = ak.stock_zh_ah_daily(symbol="02318", start_year="2020", end_year="2026", adjust="")
+print(df)
 ```
 
 ---
@@ -1210,11 +1274,14 @@ curl -X GET "http://web.ifzq.gtimg.cn/appstock/app/hkfqkline/get?_var=kline_dayh
 |--------|------|------|------|--------|
 | symbol | string | 是 | 股票代码（带市场前缀） | sh689009 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取CDR个股历史行情数据
-curl -X GET "https://finance.sina.com.cn/realstock/company/sh689009/hisdata_klc2/klc_kl.js"
+df = ak.stock_zh_a_hist(symbol="689009", period="daily", start_date="20240101", end_date="20241231")
+print(df)
 ```
 
 ---
@@ -1239,16 +1306,29 @@ curl -X GET "https://finance.sina.com.cn/realstock/company/sh689009/hisdata_klc2
 - 日期范围是否合理
 - 网络连接是否正常
 
-```bash
-# 检查API响应状态
-response=$(curl -s -w "\n%{http_code}" "https://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.000657&beg=20240220&end=20260301")
-http_code=$(echo "$response" | tail -n1)
-body=$(echo "$response" | sed '$d')
+```python
+import requests
+import json
 
-if [ "$http_code" -eq 200 ]; then
-  echo "请求成功"
-  echo "$body" | jq .
-else
-  echo "请求失败，HTTP状态码: $http_code"
-fi
+# 检查API响应状态
+url = "https://push2his.eastmoney.com/api/qt/stock/kline/get"
+params = {
+    "fields1": "f1,f2,f3,f4,f5,f6",
+    "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116",
+    "ut": "7eea3edcaed734bea9cbfc24409ed989",
+    "klt": "101",
+    "fqt": "1",
+    "secid": "0.000657",
+    "beg": "20240220",
+    "end": "20260301"
+}
+
+response = requests.get(url, params=params)
+
+if response.status_code == 200:
+    print("请求成功")
+    data = response.json()
+    print(json.dumps(data, indent=2, ensure_ascii=False))
+else:
+    print(f"请求失败，HTTP状态码: {response.status_code}")
 ```

@@ -2,12 +2,12 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的其他类型数据接口，包括新闻、公告、交易日历等。所有接口均来自东方财富网等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的其他类型数据接口，包括新闻、公告、交易日历等。所有接口均来自东方财富网等公开数据源。
 
 ## 重要说明
 
-- 所有接口均为 HTTP GET 请求
-- 返回格式为 JSON
+- 所有接口均为 Python 函数调用
+- 返回格式为 pandas.DataFrame
 - 数据来源：东方财富网等公开 API
 - 数据仅供学术研究使用，不构成投资建议
 
@@ -35,11 +35,14 @@
 | source | string | 是 | 来源 | WEB |
 | client | string | 是 | 客户端 | WEB |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取股票账户统计
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_DATA_ACCOUNT_STATISTIC&columns=ALL&source=WEB&client=WEB"
+```python
+import akshare as ak
+
+# 获取股票账户统计数据
+df = ak.stock_account_statistics_em()
+print(df)
 ```
 
 ---
@@ -65,11 +68,14 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_DAT
 | client | string | 是 | 客户端 | WEB |
 | filter | string | 是 | 筛选条件 | 日期等 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取龙虎榜数据
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_BILLBOARD_DAILYDETAILS&columns=ALL&source=WEB&client=WEB"
+```python
+import akshare as ak
+
+# 获取龙虎榜详细数据
+df = ak.stock_lhb_detail_em()
+print(df)
 ```
 
 ---
@@ -86,11 +92,14 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_BIL
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取股权质押市场概况
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_GPZY_MARKETPROFILE&columns=ALL&source=WEB&client=WEB"
+```python
+import akshare as ak
+
+# 获取股权质押数据
+df = ak.stock_gpzy_pledge_ratio_em()
+print(df)
 ```
 
 ---
@@ -107,11 +116,14 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_GPZ
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取融资融券数据
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_RZRQ_LSHJ&columns=ALL&source=WEB&client=WEB"
+df = ak.stock_margin_account_info()
+print(df)
 ```
 
 ---
@@ -128,11 +140,14 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_RZR
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取机构调研数据
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_ORG_SURVEY&columns=ALL&source=WEB&client=WEB"
+df = ak.stock_jgdy_tj_em()
+print(df)
 ```
 
 ---
@@ -149,11 +164,14 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_ORG
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取港股通资金流向
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_HKSTOCK_FLOW&columns=ALL&source=WEB&client=WEB"
+```python
+import akshare as ak
+
+# 获取港股通资金流向数据
+df = ak.stock_hsgt_fund_flow_summary_em()
+print(df)
 ```
 
 ---
@@ -170,11 +188,14 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_HKS
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取涨停股列表
-curl -s "https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=500&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f3&fs=m:0 t:6 f:!2,m:0 t:80 f:!2,m:1 t:2 f:!2,m:1 t:23 f:!2&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18"
+```python
+import akshare as ak
+
+# 获取涨停股列表数据
+df = ak.stock_zt_pool_em()
+print(df)
 ```
 
 ---
@@ -191,14 +212,14 @@ curl -s "https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=500&po=1&np=1&ut=b
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 上交所交易日历
-curl -s "http://www.sse.com.cn/market/others/tradecalendar/"
+```python
+import akshare as ak
 
-# 深交所交易日历
-curl -s "http://www.szse.cn/market/calendar/index.html"
+# 获取交易日历数据
+df = ak.tool_trade_date_hist_sina()
+print(df)
 ```
 
 ---

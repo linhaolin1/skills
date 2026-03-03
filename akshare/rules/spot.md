@@ -2,12 +2,12 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的现货数据接口。所有接口均来自99期货、东方财富网等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的现货数据接口。所有接口均来自99期货、东方财富网等公开数据源。
 
 ## 重要说明
 
-- 所有接口均为 HTTP GET 请求
-- 返回格式为 JSON
+- 所有接口均为 Python 函数调用
+- 返回格式为 pandas.DataFrame
 - 数据来源：99期货、东方财富网公开 API
 - 数据仅供学术研究使用，不构成投资建议
 
@@ -52,14 +52,14 @@
 | fp | 期货收盘价 |
 | sp | 现货价格 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取螺纹钢现货价格（需要先获取token）
-curl -s "https://centerapi.fx168api.com/app/qh/api/spot/trend?productId=rb&pageNo=1&pageSize=50000&startDate=&endDate=2050-01-01&appCategory=web" \
-  -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
-  -H "Origin: https://www.99qh.com" \
-  -H "Referer: https://www.99qh.com"
+```python
+import akshare as ak
+
+# 获取螺纹钢现货价格数据
+df = ak.spot_price_qh(symbol="螺纹钢")
+print(df)
 ```
 
 ---
@@ -90,11 +90,14 @@ curl -s "https://centerapi.fx168api.com/app/qh/api/spot/trend?productId=rb&pageN
 | 生产商 | 相关生产商 |
 | 下游用户 | 下游用户 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取能源类现货与股票关联
-curl -s "https://data.eastmoney.com/ifdata/xhgp.html"
+```python
+import akshare as ak
+
+# 获取能源类现货与股票关联数据
+df = ak.futures_spot_stock(symbol="能源")
+print(df)
 ```
 
 ---
@@ -111,11 +114,14 @@ curl -s "https://data.eastmoney.com/ifdata/xhgp.html"
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取现货品种对照表
-curl -s "https://www.99qh.com/data/spotTrend"
+```python
+import akshare as ak
+
+# 获取现货品种对照表数据
+df = ak.spot_symbol_table_sge()
+print(df)
 ```
 
 ---

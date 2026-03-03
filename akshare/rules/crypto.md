@@ -2,12 +2,12 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的加密货币数据接口。所有接口均来自金十数据等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的加密货币数据接口。所有接口均来自金十数据等公开数据源。
 
 ## 重要说明
 
-- 所有接口均为 HTTP GET 请求
-- 返回格式为 JSON
+- 所有接口均为 Python 函数调用
+- 返回格式为 pandas.DataFrame
 - 数据来源：金十数据等公开 API
 - 数据仅供学术研究使用，不构成投资建议
 
@@ -50,13 +50,14 @@
 | 公告链接 | 公告链接 |
 | 分类 | 公司分类 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取比特币持仓报告
-curl -s "https://datacenter-api.jin10.com/bitcoin_treasuries/list" \
-  -H "X-App-Id: lnFP5lxse24wPgtY" \
-  -H "X-Version: 1.0.0"
+```python
+import akshare as ak
+
+# 获取比特币持仓报告数据
+df = ak.crypto_bitcoin_hold_report()
+print(df)
 ```
 
 ---
@@ -73,15 +74,14 @@ curl -s "https://datacenter-api.jin10.com/bitcoin_treasuries/list" \
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取比特币价格（示例，需要具体交易所API）
-# Binance API
-curl -s "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"
+```python
+import akshare as ak
 
-# 获取以太坊价格
-curl -s "https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT"
+# 获取加密货币实时行情数据
+df = ak.crypto_js_spot()
+print(df)
 ```
 
 ---

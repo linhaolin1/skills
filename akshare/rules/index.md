@@ -2,12 +2,12 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的指数数据接口。所有接口均来自东方财富网、新浪财经等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的指数数据接口。所有接口均来自东方财富网、新浪财经等公开数据源。
 
 ## 重要说明
 
-- 所有接口均为 HTTP GET 请求
-- 返回格式为 JSON
+- 所有接口均为 Python 函数调用
+- 返回格式为 pandas.DataFrame
 - 数据来源：东方财富网、新浪财经公开 API
 - 数据仅供学术研究使用，不构成投资建议
 
@@ -41,14 +41,18 @@
 | fs | string | 是 | 市场筛选 | m:1 s:000001,m:1 s:000300 等 |
 | fields | string | 是 | 返回字段 | f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取上证系列指数
-curl -s "https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=5000&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m:1&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18"
+```python
+import akshare as ak
+
+# 获取上证系列指数实时行情
+df = ak.stock_zh_index_spot_em(symbol="上证系列指数")
+print(df)
 
 # 获取深证系列指数
-curl -s "https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=5000&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m:0&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18"
+df = ak.stock_zh_index_spot_em(symbol="深证系列指数")
+print(df)
 ```
 
 ---
@@ -77,17 +81,14 @@ curl -s "https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=5000&po=1&np=1&ut=
 | fields2 | string | 是 | 字段2 | f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116 |
 | ut | string | 是 | 用户标识 | 7eea3edcaed734bea9cbfc24409ed989 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取上证指数(000001)历史数据
-curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.000001&klt=101&fqt=1&lmt=10000&end=20500000&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116&ut=7eea3edcaed734bea9cbfc24409ed989"
+```python
+import akshare as ak
 
-# 获取沪深300指数(000300)历史数据
-curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.000300&klt=101&fqt=1&lmt=10000&end=20500000&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116&ut=7eea3edcaed734bea9cbfc24409ed989"
-
-# 获取创业板指(399006)历史数据
-curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=0.399006&klt=101&fqt=1&lmt=10000&end=20500000&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116&ut=7eea3edcaed734bea9cbfc24409ed989"
+# 获取上证指数历史K线数据
+df = ak.stock_zh_index_daily_em(symbol="000001")
+print(df)
 ```
 
 ---
@@ -113,11 +114,14 @@ curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=0.399006&kl
 | fields | string | 是 | 返回字段 | f43,f57,f58,f169,f170,f46,f44,f51,f168,f47,f164,f163 |
 | secid | string | 是 | 证券ID | 1.000001 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取上证指数实时详情
-curl -s "https://push2.eastmoney.com/api/qt/stock/get?ut=fa5fd1943c7b386f172d6893dbfba10b&invt=2&fltt=2&fields=f43,f57,f58,f169,f170,f46,f44,f51,f168,f47,f164,f163&secid=1.000001"
+```python
+import akshare as ak
+
+# 获取指数实时详情数据
+df = ak.index_stock_info()
+print(df)
 ```
 
 ---

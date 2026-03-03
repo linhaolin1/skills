@@ -2,12 +2,12 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的利率数据接口。所有接口均来自东方财富网、中国外汇交易中心等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的利率数据接口。所有接口均来自东方财富网、中国外汇交易中心等公开数据源。
 
 ## 重要说明
 
-- 所有接口均为 HTTP GET 请求
-- 返回格式为 JSON
+- 所有接口均为 Python 函数调用
+- 返回格式为 pandas.DataFrame
 - 数据来源：东方财富网、中国外汇交易中心公开 API
 - 数据仅供学术研究使用，不构成投资建议
 
@@ -83,10 +83,14 @@
 | 利率 | 利率值(%) |
 | 涨跌 | 涨跌幅度 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_IMP_INTRESTRATEN&columns=REPORT_DATE,REPORT_PERIOD,IR_RATE,CHANGE_RATE,INDICATOR_ID,LATEST_RECORD,MARKET,MARKET_CODE,CURRENCY,CURRENCY_CODE&filter=(MARKET_CODE=\"001\")(CURRENCY_CODE=\"CNY\")(INDICATOR_ID=\"203\")&pageNumber=1&pageSize=500&sortTypes=-1&sortColumns=REPORT_DATE&source=WEB&client=WEB"
+```python
+import akshare as ak
+
+# 获取银行间拆借利率数据
+df = ak.macro_china_shibor_all()
+print(df)
 ```
 
 ---
@@ -111,10 +115,14 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_IMP
 | FR007 | 7天回购定盘利率(%) |
 | FR014 | 14天回购定盘利率(%) |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://www.chinamoney.com.cn/r/cms/www/chinamoney/data/currency/frr-chrt.csv"
+```python
+import akshare as ak
+
+# 获取回购定盘利率数据
+df = ak.forex_spot_em()
+print(df)
 ```
 
 ---
@@ -139,15 +147,19 @@ curl -s "https://www.chinamoney.com.cn/r/cms/www/chinamoney/data/currency/frr-ch
 | FDR007 | 银银间7天回购定盘利率(%) |
 | FDR014 | 银银间14天回购定盘利率(%) |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s "https://www.chinamoney.com.cn/r/cms/www/chinamoney/data/currency/fdr-chrt.csv"
+```python
+import akshare as ak
+
+# 获取银银间回购定盘利率数据
+df = ak.forex_spot_em()
+print(df)
 ```
 
 ---
 
-### 4. 回购定盘利率历史查询
+### 4. 人民币LPR利率
 
 **接口名称**: 回购定盘利率历史数据查询
 
@@ -177,10 +189,14 @@ curl -s "https://www.chinamoney.com.cn/r/cms/www/chinamoney/data/currency/fdr-ch
 | FDR007 | 银银间7天回购定盘利率(%) |
 | FDR014 | 银银间14天回购定盘利率(%) |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s -X POST "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/FrrHis?lang=CN&startDate=2024-01-01&endDate=2024-01-31" -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取LPR利率数据
+df = ak.macro_china_lpr()
+print(df)
 ```
 
 ---

@@ -2,12 +2,12 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的电影票房数据接口。所有接口均来自艺恩数据等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的电影票房数据接口。所有接口均来自艺恩数据等公开数据源。
 
 ## 重要说明
 
-- 接口为 HTTP POST 请求
-- 返回格式为加密JSON（需要解密）
+- 接口为 Python 函数调用
+- 返回格式为 pandas.DataFrame
 - 数据来源：艺恩数据公开 API
 - 数据仅供学术研究使用，不构成投资建议
 
@@ -44,12 +44,14 @@
 | 上映天数 | 上映天数 |
 | 累计票房 | 累计票房(万元) |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s -X POST "https://www.endata.com.cn/API/GetData.ashx" \
-  -d "showDate=&tdate=2024-02-20&MethodName=BoxOffice_GetHourBoxOffice" \
-  -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取电影实时票房数据
+df = ak.movie_boxoffice_realtime()
+print(df)
 ```
 
 ---
@@ -86,12 +88,14 @@ curl -s -X POST "https://www.endata.com.cn/API/GetData.ashx" \
 | 口碑指数 | 口碑指数 |
 | 上映天数 | 上映天数 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s -X POST "https://www.endata.com.cn/API/GetData.ashx" \
-  -d "sdate=2024-02-19&edate=2024-02-18&MethodName=BoxOffice_GetDayBoxOffice" \
-  -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取电影单日票房数据
+df = ak.movie_boxoffice_daily(date="20240219")
+print(df)
 ```
 
 ---
@@ -128,12 +132,14 @@ curl -s -X POST "https://www.endata.com.cn/API/GetData.ashx" \
 | 口碑指数 | 口碑指数 |
 | 上映天数 | 上映天数 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s -X POST "https://www.endata.com.cn/API/GetData.ashx" \
-  -d "sdate=2024-02-12&MethodName=BoxOffice_GetWeekInfoData" \
-  -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取电影单周票房数据
+df = ak.movie_boxoffice_weekly(date="20240218")
+print(df)
 ```
 
 ---
@@ -169,12 +175,14 @@ curl -s -X POST "https://www.endata.com.cn/API/GetData.ashx" \
 | 口碑指数 | 口碑指数 |
 | 月内天数 | 月内上映天数 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s -X POST "https://www.endata.com.cn/API/GetData.ashx" \
-  -d "startTime=2024-02-01&MethodName=BoxOffice_GetMonthBox" \
-  -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取电影单月票房数据
+df = ak.movie_boxoffice_monthly(date="20240218")
+print(df)
 ```
 
 ---
@@ -209,12 +217,14 @@ curl -s -X POST "https://www.endata.com.cn/API/GetData.ashx" \
 | 国家及地区 | 制片国家/地区 |
 | 上映日期 | 上映日期 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s -X POST "https://www.endata.com.cn/API/GetData.ashx" \
-  -d "year=2024&MethodName=BoxOffice_GetYearInfoData" \
-  -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取电影年度票房数据
+df = ak.movie_boxoffice_yearly(date="20240218")
+print(df)
 ```
 
 ---
@@ -250,12 +260,14 @@ curl -s -X POST "https://www.endata.com.cn/API/GetData.ashx" \
 | 上映日期 | 上映日期 |
 | 首周天数 | 首周天数 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s -X POST "https://www.endata.com.cn/API/GetData.ashx" \
-  -d "year=2024&MethodName=BoxOffice_getYearInfo_fData" \
-  -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取电影年度首周票房数据
+df = ak.movie_boxoffice_yearly_first_week(date="20201018")
+print(df)
 ```
 
 ---
@@ -291,12 +303,14 @@ curl -s -X POST "https://www.endata.com.cn/API/GetData.ashx" \
 | 场均票价 | 场均票价(元) |
 | 上座率 | 上座率(%) |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s -X POST "https://www.endata.com.cn/API/GetData.ashx" \
-  -d "rowNum1=1&rowNum2=100&date=20240219&MethodName=BoxOffice_GetCinemaDayBoxOffice" \
-  -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取影院日票房排行数据
+df = ak.movie_boxoffice_cinema_daily(date="20240219")
+print(df)
 ```
 
 ---
@@ -332,12 +346,14 @@ curl -s -X POST "https://www.endata.com.cn/API/GetData.ashx" \
 | 单日单厅票房 | 单日单厅票房(元) |
 | 单日单厅场次 | 单日单厅场次 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-curl -s -X POST "https://www.endata.com.cn/API/GetData.ashx" \
-  -d "dateID=1088&rowNum1=1&rowNum2=100&MethodName=BoxOffice_GetCinemaWeekBoxOffice" \
-  -H "User-Agent: Mozilla/5.0"
+```python
+import akshare as ak
+
+# 获取影院周票房排行数据
+df = ak.movie_boxoffice_cinema_weekly(date="20240219")
+print(df)
 ```
 
 ---

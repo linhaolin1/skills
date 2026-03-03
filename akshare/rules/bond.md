@@ -2,12 +2,12 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的债券数据接口。所有接口均来自东方财富网、中国债券信息网等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的债券数据接口。所有接口均来自东方财富网、中国债券信息网等公开数据源。
 
 ## 重要说明
 
-- 所有接口均为 HTTP GET 请求
-- 返回格式为 JSON
+- 所有接口均为 Python 函数调用
+- 返回格式为 pandas.DataFrame
 - 数据来源：东方财富网、中国债券信息网公开 API
 - 数据仅供学术研究使用，不构成投资建议
 
@@ -53,11 +53,14 @@
 | EMG00001310 | 美国国债收益率10年 |
 | EMG00001312 | 美国国债收益率30年 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取中美国债收益率数据
-curl -s "https://datacenter.eastmoney.com/api/data/get?type=RPTA_WEB_TREASURYYIELD&sty=ALL&st=SOLAR_DATE&sr=-1&token=894050c76af8597a853f5b408b759f5d&p=1&ps=500&pageNo=1&pageNum=1"
+df = ak.bond_zh_us_rate()
+print(df)
 ```
 
 ---
@@ -86,11 +89,14 @@ curl -s "https://datacenter.eastmoney.com/api/data/get?type=RPTA_WEB_TREASURYYIE
 | source | string | 是 | 来源 | WEB |
 | client | string | 是 | 客户端 | WEB |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取可转债实时行情
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?sortColumns=SECUCODE&sortTypes=-1&pageSize=500&pageNumber=1&reportName=RPT_BOND_CB_LIST&columns=ALL&source=WEB&client=WEB"
+```python
+import akshare as ak
+
+# 获取可转债实时行情数据
+df = ak.bond_zh_hs_cov_spot()
+print(df)
 ```
 
 ---
@@ -121,11 +127,14 @@ curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?sortColumns=SECUCO
 | fs | string | 是 | 市场筛选 | m:144 |
 | fields | string | 是 | 返回字段 | f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取国债期货实时行情
-curl -s "https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=m:144&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18"
+```python
+import akshare as ak
+
+# 获取国债期货实时行情数据
+df = ak.futures_zh_realtime(symbol="TF")
+print(df)
 ```
 
 ---

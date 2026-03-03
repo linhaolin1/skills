@@ -2,12 +2,12 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的基金数据接口。所有接口均来自东方财富网、天天基金网等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的基金数据接口。所有接口均来自东方财富网、天天基金网等公开数据源。
 
 ## 重要说明
 
-- 所有接口均为 HTTP GET 请求
-- 返回格式为 JSON
+- 所有接口均为 Python 函数调用
+- 返回格式为 pandas.DataFrame
 - 数据来源：东方财富网、天天基金网公开 API
 - 数据仅供学术研究使用，不构成投资建议
 
@@ -41,11 +41,14 @@
 | fs | string | 是 | 市场筛选 | b:MK0404 |
 | fields | string | 是 | 返回字段 | f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取ETF实时行情
-curl -s "https://88.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=5000&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=b:MK0404&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23"
+```python
+import akshare as ak
+
+# 获取ETF实时行情数据
+df = ak.fund_etf_spot_em()
+print(df)
 ```
 
 ---
@@ -74,11 +77,14 @@ curl -s "https://88.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=5000&po=1&np=1&
 | fields2 | string | 是 | 字段2 | f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116 |
 | ut | string | 是 | 用户标识 | 7eea3edcaed734bea9cbfc24409ed989 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取沪深300ETF(510300)历史数据
-curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.510300&klt=101&fqt=1&lmt=10000&end=20500000&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f116&ut=7eea3edcaed734bea9cbfc24409ed989"
+```python
+import akshare as ak
+
+# 获取沪深300ETF(510300)历史K线数据
+df = ak.fund_etf_hist_em(symbol="510300", period="daily", start_date="20230101", end_date="20250101")
+print(df)
 ```
 
 ---
@@ -109,11 +115,14 @@ curl -s "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.510300&kl
 | fs | string | 是 | 市场筛选 | b:MK0405 |
 | fields | string | 是 | 返回字段 | f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取LOF基金实时行情
-curl -s "https://2.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=5000&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f12&fs=b:MK0405&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23"
+```python
+import akshare as ak
+
+# 获取LOF基金实时行情数据
+df = ak.fund_lof_spot_em()
+print(df)
 ```
 
 ---
@@ -144,11 +153,14 @@ curl -s "https://2.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=5000&po=1&np=1&u
 | atfc | string | 是 | 参数 | 空 |
 | onlySale | string | 是 | 仅销售 | 0 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取开放式基金净值
-curl -s "https://fund.eastmoney.com/Data/Fund_JJJZ_Data.aspx?t=1&lx=1&letter=&gsid=&text=&sort=zdf,desc&page=1,50000&dt=$(date +%s)000&atfc=&onlySale=0"
+```python
+import akshare as ak
+
+# 获取开放式基金每日净值数据
+df = ak.fund_open_fund_daily_em()
+print(df)
 ```
 
 ---
@@ -165,11 +177,14 @@ curl -s "https://fund.eastmoney.com/Data/Fund_JJJZ_Data.aspx?t=1&lx=1&letter=&gs
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取所有基金代码列表
-curl -s "https://fund.eastmoney.com/js/fundcode_search.js"
+```python
+import akshare as ak
+
+# 获取基金基本信息
+df = ak.fund_overview_em(symbol="000001")
+print(df)
 ```
 
 ---
@@ -186,11 +201,14 @@ curl -s "https://fund.eastmoney.com/js/fundcode_search.js"
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取基金000001的详细信息
-curl -s "https://fund.eastmoney.com/pingzhongdata/000001.js"
+```python
+import akshare as ak
+
+# 获取单只基金的详细信息
+df = ak.fund_info_index_em(symbol="000001")
+print(df)
 ```
 
 ---
@@ -214,11 +232,14 @@ curl -s "https://fund.eastmoney.com/pingzhongdata/000001.js"
 | indexcode | string | 是 | 指数代码 | 000300 |
 | type | string | 是 | 周期类型 | m(1月)/q(3月)/hy(6月)/y(1年)/try(3年)/fiy(5年)/sy(今年来)/se(成立来) |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
-# 获取基金000001的累计收益率
-curl -s "https://api.fund.eastmoney.com/pinzhong/LJSYLZS?fundCode=000001&indexcode=000300&type=y" -H "Referer: https://fund.eastmoney.com/"
+```python
+import akshare as ak
+
+# 获取基金累计收益率走势数据
+df = ak.fund_info_index_em(symbol="000001")
+print(df)
 ```
 
 ---

@@ -2,13 +2,13 @@
 
 ## 概述
 
-本文档基于 AKShare 实际使用的数据源 API，提供可以直接通过 curl 调用的外汇数据接口。所有接口均来自中国外汇交易中心等公开数据源。
+本文档基于 AKShare 封装好的 Python 库，提供可以通过 Python 调用的外汇数据接口。所有接口均来自东方财富网等公开数据源。
 
 ## 重要说明
 
-- 所有接口均为 HTTP GET/POST 请求
-- 返回格式为 JSON
-- 数据来源：中国外汇交易中心公开 API
+- 所有接口均为 Python 函数调用
+- 返回格式为 pandas.DataFrame
+- 数据来源：东方财富网公开 API
 - 数据仅供学术研究使用，不构成投资建议
 
 ---
@@ -36,11 +36,14 @@
 | midprice | 中间价 |
 | time | 时间 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取人民币外汇即期报价
-curl -s "http://www.chinamoney.com.cn/r/cms/www/chinamoney/data/fx/rfx-sp-quot.json"
+df = ak.forex_spot_em()
+print(df)
 ```
 
 ---
@@ -68,11 +71,14 @@ curl -s "http://www.chinamoney.com.cn/r/cms/www/chinamoney/data/fx/rfx-sp-quot.j
 | label_9M | 9月期限 |
 | label_1Y | 1年期限 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取人民币外汇远掉报价
-curl -s "http://www.chinamoney.com.cn/r/cms/www/chinamoney/data/fx/rfx-sw-quot.json"
+df = ak.forex_spot_em()
+print(df)
 ```
 
 ---
@@ -98,11 +104,14 @@ curl -s "http://www.chinamoney.com.cn/r/cms/www/chinamoney/data/fx/rfx-sw-quot.j
 | midprice | 中间价 |
 | time | 时间 |
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取外币对即期报价
-curl -s "http://www.chinamoney.com.cn/r/cms/www/chinamoney/data/fx/cpair-quot.json"
+df = ak.forex_spot_em()
+print(df)
 ```
 
 ---
@@ -119,11 +128,14 @@ curl -s "http://www.chinamoney.com.cn/r/cms/www/chinamoney/data/fx/cpair-quot.js
 
 **请求方式**: GET
 
-**curl 调用示例**:
+**Python 调用示例**:
 
-```bash
+```python
+import akshare as ak
+
 # 获取人民币汇率中间价
-curl -s "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_RMB_EXCHANGE_RATE&columns=ALL&source=WEB&client=WEB"
+df = ak.macro_china_rmb()
+print(df)
 ```
 
 ---
