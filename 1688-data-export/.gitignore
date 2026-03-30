@@ -1,9 +1,8 @@
 # Dependencies
 node_modules/
 
-# Build output
+# Build output (local)
 crm-export
-crm-export-*
 browser_data/
 
 # Output files
