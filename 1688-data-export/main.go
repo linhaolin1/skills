@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/chromedp/chromedp"
@@ -104,34 +105,59 @@ func runExport(cmd *cobra.Command, args []string) {
 		Platform:  runtime.GOOS,
 	}
 
-	var err error
-	data.MarketingCRM, err = exportMarketingCRM(ctx)
-	if err != nil {
-		log.Printf("营销平台CRM导出失败: %v", err)
+	if err := loginAndWait(ctx); err != nil {
+		log.Printf("登录失败: %v", err)
+		return
 	}
 
-	data.CustomerManagement, err = exportCustomerManagement(ctx)
-	if err != nil {
-		log.Printf("客户管理系统导出失败: %v", err)
-	}
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	var marketingErr, customerErr error
+	var marketingData *MarketingCRMData
+	var customerData *CustomerManagementData
+
+	ctx1, cancel1 := chromedp.NewContext(allocCtx, chromedp.WithErrorf(silentLogger))
+	defer cancel1()
+
+	ctx2, cancel2 := chromedp.NewContext(allocCtx, chromedp.WithErrorf(silentLogger))
+	defer cancel2()
+
+	go func() {
+		defer wg.Done()
+		marketingData, marketingErr = exportMarketingCRM(ctx1)
+		if marketingErr != nil {
+			log.Printf("营销平台CRM导出失败: %v", marketingErr)
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		customerData, customerErr = exportCustomerManagement(ctx2)
+		if customerErr != nil {
+			log.Printf("客户管理系统导出失败: %v", customerErr)
+		}
+	}()
+
+	wg.Wait()
+
+	data.MarketingCRM = marketingData
+	data.CustomerManagement = customerData
 
 	saveData(data, outputDir)
 }
 
-func exportMarketingCRM(ctx context.Context) (*MarketingCRMData, error) {
-	fmt.Println("\n【数据源一】营销平台CRM")
+func loginAndWait(ctx context.Context) error {
+	fmt.Println("\n【登录检测】")
 
-	result := &MarketingCRMData{}
-
-	fmt.Println("\n1. 潜客机会")
 	var currentURL string
 	err := chromedp.Run(ctx,
-		chromedp.Navigate("https://p4p.1688.com/main.html#!/crmbuyer?tab=potential&potentialType=potential_real"),
-		chromedp.Sleep(5*time.Second),
+		chromedp.Navigate("https://p4p.1688.com/main.html"),
+		chromedp.Sleep(3*time.Second),
 		chromedp.Location(&currentURL),
 	)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if strings.Contains(currentURL, "login") {
@@ -144,21 +170,37 @@ func exportMarketingCRM(ctx context.Context) (*MarketingCRMData, error) {
 		for {
 			select {
 			case <-loginCtx.Done():
-				return nil, fmt.Errorf("登录超时")
+				return fmt.Errorf("登录超时")
 			default:
 				time.Sleep(3 * time.Second)
 				var checkURL string
 				chromedp.Run(ctx, chromedp.Location(&checkURL))
 				if !strings.Contains(checkURL, "login") {
 					fmt.Println("登录成功！")
-					goto loginDone
+					return nil
 				}
 			}
 		}
 	}
-loginDone:
 
-	chromedp.Run(ctx, chromedp.Sleep(3*time.Second))
+	fmt.Println("已登录，继续执行...")
+	return nil
+}
+
+func exportMarketingCRM(ctx context.Context) (*MarketingCRMData, error) {
+	fmt.Println("\n【数据源一】营销平台CRM (并发)")
+
+	result := &MarketingCRMData{}
+
+	fmt.Println("\n1. 潜客机会")
+	err := chromedp.Run(ctx,
+		chromedp.Navigate("https://p4p.1688.com/main.html#!/crmbuyer?tab=potential&potentialType=potential_real"),
+		chromedp.Sleep(3*time.Second),
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	result.PotentialCustomers = extractTables(ctx)
 	fmt.Printf("  找到 %d 行数据\n", len(result.PotentialCustomers))
 
@@ -221,7 +263,7 @@ loginDone:
 }
 
 func exportCustomerManagement(ctx context.Context) (*CustomerManagementData, error) {
-	fmt.Println("\n【数据源二】客户管理系统")
+	fmt.Println("\n【数据源二】客户管理系统 (并发)")
 
 	result := &CustomerManagementData{
 		URL: "https://air.1688.com/app/CSBC-modules/csbc-page-member-crm/index.html",
