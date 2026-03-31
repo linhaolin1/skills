@@ -103,6 +103,17 @@ func runExport(cmd *cobra.Command, args []string) {
 	data := &CRMData{
 		Timestamp: time.Now().Format(time.RFC3339),
 		Platform:  runtime.GOOS,
+		MarketingCRM: &MarketingCRMData{
+			PotentialCustomers: [][]string{},
+			PotentialPublic:    [][]string{},
+			OldCustomersFirst:  [][]string{},
+			OldCustomersSecond: [][]string{},
+		},
+		CustomerManagement: &CustomerManagementData{
+			URL:    "",
+			Tabs:   []Tab{},
+			Tables: []Table{},
+		},
 	}
 
 	if err := loginAndWait(ctx); err != nil {
@@ -114,35 +125,41 @@ func runExport(cmd *cobra.Command, args []string) {
 	wg.Add(2)
 
 	var marketingErr, customerErr error
-	var marketingData *MarketingCRMData
-	var customerData *CustomerManagementData
 
-	ctx1, cancel1 := chromedp.NewContext(allocCtx, chromedp.WithErrorf(silentLogger))
+	ctx1, cancel1 := chromedp.NewContext(ctx)
 	defer cancel1()
 
-	ctx2, cancel2 := chromedp.NewContext(allocCtx, chromedp.WithErrorf(silentLogger))
+	ctx2, cancel2 := chromedp.NewContext(ctx)
 	defer cancel2()
 
 	go func() {
 		defer wg.Done()
-		marketingData, marketingErr = exportMarketingCRM(ctx1)
-		if marketingErr != nil {
-			log.Printf("营销平台CRM导出失败: %v", marketingErr)
+		result, err := exportMarketingCRM(ctx1)
+		if err != nil {
+			marketingErr = err
+			log.Printf("营销平台CRM导出失败: %v", err)
+			return
 		}
+		data.MarketingCRM = result
 	}()
 
 	go func() {
 		defer wg.Done()
-		customerData, customerErr = exportCustomerManagement(ctx2)
-		if customerErr != nil {
-			log.Printf("客户管理系统导出失败: %v", customerErr)
+		result, err := exportCustomerManagement(ctx2)
+		if err != nil {
+			customerErr = err
+			log.Printf("客户管理系统导出失败: %v", err)
+			return
 		}
+		data.CustomerManagement = result
 	}()
 
 	wg.Wait()
 
-	data.MarketingCRM = marketingData
-	data.CustomerManagement = customerData
+	if marketingErr != nil && customerErr != nil {
+		log.Printf("两个数据源都失败，退出")
+		return
+	}
 
 	saveData(data, outputDir)
 }
@@ -402,27 +419,29 @@ func saveCSV(data *CRMData, filename string) {
 	writer.Write([]string{"========================================"})
 	writer.Write([]string{})
 
-	writer.Write([]string{"潜客机会"})
-	for _, row := range data.MarketingCRM.PotentialCustomers {
-		writer.Write(row)
-	}
+	if data.MarketingCRM != nil {
+		writer.Write([]string{"潜客机会"})
+		for _, row := range data.MarketingCRM.PotentialCustomers {
+			writer.Write(row)
+		}
 
-	writer.Write([]string{})
-	writer.Write([]string{"潜客公海"})
-	for _, row := range data.MarketingCRM.PotentialPublic {
-		writer.Write(row)
-	}
+		writer.Write([]string{})
+		writer.Write([]string{"潜客公海"})
+		for _, row := range data.MarketingCRM.PotentialPublic {
+			writer.Write(row)
+		}
 
-	writer.Write([]string{})
-	writer.Write([]string{"老客管理 - 第一次获取"})
-	for _, row := range data.MarketingCRM.OldCustomersFirst {
-		writer.Write(row)
-	}
+		writer.Write([]string{})
+		writer.Write([]string{"老客管理 - 第一次获取"})
+		for _, row := range data.MarketingCRM.OldCustomersFirst {
+			writer.Write(row)
+		}
 
-	writer.Write([]string{})
-	writer.Write([]string{"老客管理 - 重置后获取"})
-	for _, row := range data.MarketingCRM.OldCustomersSecond {
-		writer.Write(row)
+		writer.Write([]string{})
+		writer.Write([]string{"老客管理 - 重置后获取"})
+		for _, row := range data.MarketingCRM.OldCustomersSecond {
+			writer.Write(row)
+		}
 	}
 
 	writer.Write([]string{})
@@ -431,10 +450,12 @@ func saveCSV(data *CRMData, filename string) {
 	writer.Write([]string{"========================================"})
 	writer.Write([]string{})
 
-	writer.Write([]string{"全部客户明细"})
-	for _, table := range data.CustomerManagement.Tables {
-		for _, row := range table.Data {
-			writer.Write(row)
+	if data.CustomerManagement != nil {
+		writer.Write([]string{"全部客户明细"})
+		for _, table := range data.CustomerManagement.Tables {
+			for _, row := range table.Data {
+				writer.Write(row)
+			}
 		}
 	}
 }
